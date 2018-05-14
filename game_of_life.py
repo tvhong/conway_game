@@ -13,6 +13,8 @@ BLOCK_OUTLINE_WIDTH = 2
 BOARD_WIDTH = 12
 BOARD_HEIGHT = 12
 
+block_color = "DimGrey"
+
 neighbor_test_blocklist = [(0,0), (1,1)]
 toad_blocklist = [(4,4), (3,5), (3,6), (5,7), (6,5), (6,6)]
 beacon_blocklist = [(2,3), (2,4), (3,3), (3,4), (4,5), (4,6), (5,5), (5,6)]
@@ -182,7 +184,7 @@ class Board(object):
         ####### YOUR CODE HERE ######
         for x in range(BOARD_WIDTH):
             for y in range(BOARD_HEIGHT):
-                self.block_list[(x, y)] = Block(Point(x, y), "DimGrey")
+                self.block_list[(x, y)] = Block(Point(x, y), block_color)
 
     def draw_gridline(self, startp, endp):
         ''' Parameters: startp - a Point of where to start the gridline
@@ -199,15 +201,16 @@ class Board(object):
         line.draw(self.canvas)
 
 
-    def random_seed(self, percentage):
-        ''' Parameters: percentage - a number between 0 and 1 representing the
+    ''' def random_seed(self, percentage):
+        Parameters: percentage - a number between 0 and 1 representing the
                                      percentage of the board to be filled with
                                      blocks
             This method activates the specified percentage of blocks randomly.
-        '''
+
         for block in self.block_list.values():
             if random.random() < percentage:
                 block.set_live(self.canvas)
+    '''
 
     def seed(self, block_coords):
         '''
@@ -215,12 +218,11 @@ class Board(object):
         Takes in a list of (x, y) tuples representing block coordinates,
         and activates the blocks corresponding to those coordinates.
         '''
-
         #### YOUR CODE HERE #####
-        raise Exception("seed not implemented")
-
-
-
+        #raise Exception("seed not implemented")
+        for coord in block_coords:
+            block = Block(Point(coord[0], coord[1]), block_color)
+            block.set_live(self.canvas)
     def get_block_neighbors(self, block):
         '''
         Given a Block object, returns a list of neighboring blocks.
@@ -270,11 +272,11 @@ if __name__ == '__main__':
     board = Board(win, BOARD_WIDTH, BOARD_HEIGHT)
 
     ## PART 1: Make sure that the board __init__ method works
-    board.random_seed(.15)
+    #board.random_seed(.15)
 
     ## PART 2: Make sure board.seed works. Comment random_seed above and uncomment
     ##  one of the seed methods below
-    # board.seed(toad_blocklist)
+    board.seed(toad_blocklist)
 
     ## PART 3: Test that neighbors work by commenting the above and uncommenting
     ## the following two lines:
