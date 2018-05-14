@@ -179,10 +179,10 @@ class Board(object):
         # dictionary (self.block_list) that has key:value pairs of
         # (x,y):Block will be useful here.
         self.block_list = {}
-
         ####### YOUR CODE HERE ######
-        raise Exception("__init__ not implemented")
-
+        for x in range(BOARD_WIDTH):
+            for y in range(BOARD_HEIGHT):
+                self.block_list[(x, y)] = Block(Point(x, y), "DimGrey")
 
     def draw_gridline(self, startp, endp):
         ''' Parameters: startp - a Point of where to start the gridline
