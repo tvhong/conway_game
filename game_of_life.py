@@ -182,6 +182,7 @@ class Board(object):
         # (x,y):Block will be useful here.
         self.block_list = {}
         ####### YOUR CODE HERE ######
+        #raise Exception("__init__ not implemented")
         for x in range(BOARD_WIDTH):
             for y in range(BOARD_HEIGHT):
                 self.block_list[(x, y)] = Block(Point(x, y), block_color)
@@ -230,8 +231,32 @@ class Board(object):
         '''
         #### YOUR CODE HERE #####
         #### Think about edge conditions!
-        raise Exception("get_block_neighbors not implemented")
+        #raise Exception("get_block_neighbors not implemented")
 
+        x_center = block.x
+        y_center = block.y
+
+        block_neighbors = []
+
+        if (x_center - 1) >= 0\
+            and (x_center + 1) < BOARD_WIDTH\
+            and (y_center + 1) < BOARD_HEIGHT\
+            and (y_center - 1) >= 0:
+            return [self.block_list[(x_center - 1, y_center - 1)],
+                    self.block_list[(x_center - 1, y_center + 1)],
+                    self.block_list[(x_center - 1, y_center)]    ,
+                    self.block_list[(x_center + 1, y_center)]    ,
+                    self.block_list[(x_center + 1, y_center + 1)],
+                    self.block_list[(x_center + 1, y_center - 1)],
+                    self.block_list[(x_center    , y_center - 1)],
+                    self.block_list[(x_center    , y_center + 1)]]
+        '''
+        for x_neighbor in range(x_center - 1, x_center + 2):
+            for y_neighbor in range(y_center - 1, y_center + 2):
+                if (0 <= x_neighbor < BOARD_WIDTH) and (0 <= y_neighbor < BOARD_HEIGHT):
+                    block_neighbors.append(self.block_list[(x_neighbor, y_neighbor)])
+        return block_neighbors.remove(self.block_list[(x_center, y_center)])
+        '''
 
     def simulate(self):
         '''
@@ -280,8 +305,8 @@ if __name__ == '__main__':
 
     ## PART 3: Test that neighbors work by commenting the above and uncommenting
     ## the following two lines:
-    # board.seed(neighbor_test_blocklist)
-    # test_neighbors(board)
+    board.seed(neighbor_test_blocklist)
+    test_neighbors(board)
 
 
     ## PART 4: Test that simulate() works by uncommenting the next two lines:
