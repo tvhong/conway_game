@@ -1,5 +1,7 @@
+#! python2
 from graphics import *
 import random
+import pdb
 
 ## Written by Sarina Canelake & Kelly Casteel, August 2010
 ## Revised January 2011
@@ -202,16 +204,15 @@ class Board(object):
         line.draw(self.canvas)
 
 
-    ''' def random_seed(self, percentage):
-        Parameters: percentage - a number between 0 and 1 representing the
-                                     percentage of the board to be filled with
-                                     blocks
-            This method activates the specified percentage of blocks randomly.
+    def random_seed(self, percentage):
+        # Parameters: percentage - a number between 0 and 1 representing the
+        #                             percentage of the board to be filled with
+        #                             blocks
+        #    This method activates the specified percentage of blocks randomly.
 
         for block in self.block_list.values():
             if random.random() < percentage:
                 block.set_live(self.canvas)
-    '''
 
     def seed(self, block_coords):
         '''
@@ -220,10 +221,10 @@ class Board(object):
         and activates the blocks corresponding to those coordinates.
         '''
         #### YOUR CODE HERE #####
-        #raise Exception("seed not implemented")
+        # raise Exception("seed not implemented")
         for coord in block_coords:
-            block = Block(Point(coord[0], coord[1]), block_color)
-            block.set_live(self.canvas)
+            self.block_list[(coord[0], coord[1])].set_live(self.canvas)
+
     def get_block_neighbors(self, block):
         '''
         Given a Block object, returns a list of neighboring blocks.
@@ -237,11 +238,8 @@ class Board(object):
         y_center = block.y
 
         block_neighbors = []
-
-        if (x_center - 1) >= 0\
-            and (x_center + 1) < BOARD_WIDTH\
-            and (y_center + 1) < BOARD_HEIGHT\
-            and (y_center - 1) >= 0:
+        '''
+        if (x_center - 1) >= 0 and (x_center + 1) < BOARD_WIDTH and (y_center + 1) < BOARD_HEIGHT and (y_center - 1) >= 0:
             return [self.block_list[(x_center - 1, y_center - 1)],
                     self.block_list[(x_center - 1, y_center + 1)],
                     self.block_list[(x_center - 1, y_center)]    ,
@@ -254,9 +252,18 @@ class Board(object):
         for x_neighbor in range(x_center - 1, x_center + 2):
             for y_neighbor in range(y_center - 1, y_center + 2):
                 if (0 <= x_neighbor < BOARD_WIDTH) and (0 <= y_neighbor < BOARD_HEIGHT):
-                    block_neighbors.append(self.block_list[(x_neighbor, y_neighbor)])
-        return block_neighbors.remove(self.block_list[(x_center, y_center)])
-        '''
+                    neighbor_block = self.block_list[(x_neighbor, y_neighbor)]
+                    # pdb.set_trace()
+                    # neighbor_block.set_live(self.canvas)
+                    block_neighbors.append(neighbor_block)
+
+        block_neighbors.remove(self.block_list[(x_center, y_center)])
+        # pdb.set_trace()
+        # if (x_center == 0 and y_center == 0):
+        #     pdb.set_trace()
+
+        return block_neighbors
+
 
     def simulate(self):
         '''
@@ -297,17 +304,16 @@ if __name__ == '__main__':
     board = Board(win, BOARD_WIDTH, BOARD_HEIGHT)
 
     ## PART 1: Make sure that the board __init__ method works
-    #board.random_seed(.15)
+    # board.random_seed(.15)
 
     ## PART 2: Make sure board.seed works. Comment random_seed above and uncomment
     ##  one of the seed methods below
-    board.seed(toad_blocklist)
+    # board.seed(toad_blocklist)
 
     ## PART 3: Test that neighbors work by commenting the above and uncommenting
     ## the following two lines:
     board.seed(neighbor_test_blocklist)
     test_neighbors(board)
-
 
     ## PART 4: Test that simulate() works by uncommenting the next two lines:
     # board.seed(toad_blocklist)
