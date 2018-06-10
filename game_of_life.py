@@ -1,5 +1,7 @@
+#! python2
 from graphics import *
 import random
+import pdb
 
 ## Written by Sarina Canelake & Kelly Casteel, August 2010
 ## Revised January 2011
@@ -12,6 +14,8 @@ BLOCK_SIZE = 40
 BLOCK_OUTLINE_WIDTH = 2
 BOARD_WIDTH = 12
 BOARD_HEIGHT = 12
+
+block_color = "DimGrey"
 
 neighbor_test_blocklist = [(0,0), (1,1)]
 toad_blocklist = [(4,4), (3,5), (3,6), (5,7), (6,5), (6,6)]
@@ -179,10 +183,11 @@ class Board(object):
         # dictionary (self.block_list) that has key:value pairs of
         # (x,y):Block will be useful here.
         self.block_list = {}
-
         ####### YOUR CODE HERE ######
-        raise Exception("__init__ not implemented")
-
+        #raise Exception("__init__ not implemented")
+        for x in range(BOARD_WIDTH):
+            for y in range(BOARD_HEIGHT):
+                self.block_list[(x, y)] = Block(Point(x, y), block_color)
 
     def draw_gridline(self, startp, endp):
         ''' Parameters: startp - a Point of where to start the gridline
@@ -200,11 +205,11 @@ class Board(object):
 
 
     def random_seed(self, percentage):
-        ''' Parameters: percentage - a number between 0 and 1 representing the
-                                     percentage of the board to be filled with
-                                     blocks
-            This method activates the specified percentage of blocks randomly.
-        '''
+        # Parameters: percentage - a number between 0 and 1 representing the
+        #                             percentage of the board to be filled with
+        #                             blocks
+        #    This method activates the specified percentage of blocks randomly.
+
         for block in self.block_list.values():
             if random.random() < percentage:
                 block.set_live(self.canvas)
@@ -215,11 +220,10 @@ class Board(object):
         Takes in a list of (x, y) tuples representing block coordinates,
         and activates the blocks corresponding to those coordinates.
         '''
-
         #### YOUR CODE HERE #####
-        raise Exception("seed not implemented")
-
-
+        # raise Exception("seed not implemented")
+        for coord in block_coords:
+            self.block_list[(coord[0], coord[1])].set_live(self.canvas)
 
     def get_block_neighbors(self, block):
         '''
@@ -228,7 +232,22 @@ class Board(object):
         '''
         #### YOUR CODE HERE #####
         #### Think about edge conditions!
-        raise Exception("get_block_neighbors not implemented")
+        #raise Exception("get_block_neighbors not implemented")
+
+        x_center = block.x
+        y_center = block.y
+
+        block_neighbors = []
+
+        for x_neighbor in range(x_center - 1, x_center + 2):
+            for y_neighbor in range(y_center - 1, y_center + 2):
+                if (0 <= x_neighbor < BOARD_WIDTH) and (0 <= y_neighbor < BOARD_HEIGHT):
+                    neighbor_block = self.block_list[(x_neighbor, y_neighbor)]
+                    block_neighbors.append(neighbor_block)
+
+        block_neighbors.remove(self.block_list[(x_center, y_center)])
+
+        return block_neighbors
 
 
     def simulate(self):
@@ -246,8 +265,35 @@ class Board(object):
         '''
 
         #### YOUR CODE HERE #####
-        raise Exception("simulate not implemented")
+        #raise Exception("simulate not implemented")
 
+        for block in self.block_list.values():
+            self.specify_new_status(block)
+
+        for block in self.block_list.values():
+            block.reset_status(self.canvas)
+
+    def specify_new_status(self, block):
+        live_neighbours = self.count_live_neighbours(block)
+        if (block.is_live() == True):
+            # Rule 1 - Any live cell with fewer than two live neighbours dies
+            # Rule 2 - Any live cell with more than three live neighbours dies
+            if live_neighbours < 2 or live_neighbours > 3:
+                block.new_status = "dead"
+            # Rule 3 - Any live cell with exactly two or three live neighbours lives
+            else:
+                block.new_status = "live"
+        # Rule 4 - Any dead cell with exactly three lives neighbours becomes a live cell
+        if (block.is_live() == False and live_neighbours == 3):
+            block.new_status = "live"
+
+    def count_live_neighbours(self, block):
+        live_neighbours = 0
+        neighbours = self.get_block_neighbors(block)
+        for neighbour in neighbours:
+            if neighbour.is_live() == True:
+                live_neighbours += 1
+        return live_neighbours
 
 
     def animate(self):
@@ -270,7 +316,7 @@ if __name__ == '__main__':
     board = Board(win, BOARD_WIDTH, BOARD_HEIGHT)
 
     ## PART 1: Make sure that the board __init__ method works
-    board.random_seed(.15)
+    # board.random_seed(.15)
 
     ## PART 2: Make sure board.seed works. Comment random_seed above and uncomment
     ##  one of the seed methods below
@@ -278,17 +324,16 @@ if __name__ == '__main__':
 
     ## PART 3: Test that neighbors work by commenting the above and uncommenting
     ## the following two lines:
-    # board.seed(neighbor_test_blocklist)
-    # test_neighbors(board)
-
+    #board.seed(neighbor_test_blocklist)
+    #test_neighbors(board)
 
     ## PART 4: Test that simulate() works by uncommenting the next two lines:
-    # board.seed(toad_blocklist)
-    # win.after(2000, board.simulate)
+    board.seed(glider_blocklist)
+    #win.after(2000, board.simulate)
 
     ## PART 5: Try animating! Comment out win.after(2000, board.simulate) above, and
     ## uncomment win.after below.
-    # win.after(2000, board.animate)
+    win.after(2000, board.animate)
 
     ## Yay, you're done! Try seeding with different blocklists (a few are provided at the top of this file!)
 
