@@ -238,29 +238,14 @@ class Board(object):
         y_center = block.y
 
         block_neighbors = []
-        '''
-        if (x_center - 1) >= 0 and (x_center + 1) < BOARD_WIDTH and (y_center + 1) < BOARD_HEIGHT and (y_center - 1) >= 0:
-            return [self.block_list[(x_center - 1, y_center - 1)],
-                    self.block_list[(x_center - 1, y_center + 1)],
-                    self.block_list[(x_center - 1, y_center)]    ,
-                    self.block_list[(x_center + 1, y_center)]    ,
-                    self.block_list[(x_center + 1, y_center + 1)],
-                    self.block_list[(x_center + 1, y_center - 1)],
-                    self.block_list[(x_center    , y_center - 1)],
-                    self.block_list[(x_center    , y_center + 1)]]
-        '''
+
         for x_neighbor in range(x_center - 1, x_center + 2):
             for y_neighbor in range(y_center - 1, y_center + 2):
                 if (0 <= x_neighbor < BOARD_WIDTH) and (0 <= y_neighbor < BOARD_HEIGHT):
                     neighbor_block = self.block_list[(x_neighbor, y_neighbor)]
-                    # pdb.set_trace()
-                    # neighbor_block.set_live(self.canvas)
                     block_neighbors.append(neighbor_block)
 
         block_neighbors.remove(self.block_list[(x_center, y_center)])
-        # pdb.set_trace()
-        # if (x_center == 0 and y_center == 0):
-        #     pdb.set_trace()
 
         return block_neighbors
 
@@ -280,8 +265,35 @@ class Board(object):
         '''
 
         #### YOUR CODE HERE #####
-        raise Exception("simulate not implemented")
+        #raise Exception("simulate not implemented")
 
+        for block in self.block_list.values():
+            self.specify_new_status(block)
+
+        for block in self.block_list.values():
+            block.reset_status(self.canvas)
+
+    def specify_new_status(self, block):
+        live_neighbours = self.count_live_neighbours(block)
+        if (block.is_live() == True):
+            # Rule 1 - Any live cell with fewer than two live neighbours dies
+            # Rule 2 - Any live cell with more than three live neighbours dies
+            if live_neighbours < 2 or live_neighbours > 3:
+                block.new_status = "dead"
+            # Rule 3 - Any live cell with exactly two or three live neighbours lives
+            else:
+                block.new_status = "live"
+        # Rule 4 - Any dead cell with exactly three lives neighbours becomes a live cell
+        if (block.is_live() == False and live_neighbours == 3):
+            block.new_status = "live"
+
+    def count_live_neighbours(self, block):
+        live_neighbours = 0
+        neighbours = self.get_block_neighbors(block)
+        for neighbour in neighbours:
+            if neighbour.is_live() == True:
+                live_neighbours += 1
+        return live_neighbours
 
 
     def animate(self):
@@ -312,16 +324,16 @@ if __name__ == '__main__':
 
     ## PART 3: Test that neighbors work by commenting the above and uncommenting
     ## the following two lines:
-    board.seed(neighbor_test_blocklist)
-    test_neighbors(board)
+    #board.seed(neighbor_test_blocklist)
+    #test_neighbors(board)
 
     ## PART 4: Test that simulate() works by uncommenting the next two lines:
-    # board.seed(toad_blocklist)
-    # win.after(2000, board.simulate)
+    board.seed(glider_blocklist)
+    #win.after(2000, board.simulate)
 
     ## PART 5: Try animating! Comment out win.after(2000, board.simulate) above, and
     ## uncomment win.after below.
-    # win.after(2000, board.animate)
+    win.after(2000, board.animate)
 
     ## Yay, you're done! Try seeding with different blocklists (a few are provided at the top of this file!)
 
